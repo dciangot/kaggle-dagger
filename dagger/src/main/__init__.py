@@ -63,16 +63,16 @@ class KaggleDagger:
         return self
 
     @function
-    def preprocess_data(self, name: str, requirements_file: File, python_main: File) -> Self:
+    def preprocess_data(self, name: str, task_dir: Directory) -> Self:
 
         self.labcontainer = (
             self.labcontainer
-            .with_mounted_directory(f"/home/jovyan/work/{name}", self.working_dir, owner="jovyan")
-            .with_mounted_file(f"/opt/process_{name}/requirements.txt", requirements_file)
-            .with_mounted_file(f"/opt/process_{name}/main.py", python_main)
+            .with_mounted_directory(f"/home/jovyan/work/{name}", task_dir, owner="jovyan")
+            #.with_mounted_file(f"/opt/process_{name}/requirements.txt", requirements_file)
+            #.with_mounted_file(f"/opt/process_{name}/main.py", python_main)
             .with_workdir(f"/home/jovyan/work/{name}")
-            .with_exec(["pip3", "install", "-r", f"/opt/process_{name}/requirements.txt"])
-            .with_exec(["python3", f"/opt/process_{name}/main.py"])
+            .with_exec(["pip3", "install", "-r", f"requirements.txt"])
+            .with_exec(["python3", f"main.py"])
         )
 
         return self
@@ -81,7 +81,6 @@ class KaggleDagger:
     def preprocess_gpt(self, name: str, gpt_file: File, openai_token: Secret) -> Self:
         self.labcontainer = (
             self.labcontainer
-            .with_mounted_directory(f"/home/jovyan/work/{name}", self.working_dir, owner="jovyan")
             .with_mounted_file(f"/opt/process_{name}/main.gpt", gpt_file)
             .with_exec(["pip3", "install", f"gptscript"], skip_entrypoint=True)
             .with_exec(["wget", "https://github.com/duckdb/duckdb/releases/download/v1.0.0/duckdb_cli-linux-amd64.zip"], skip_entrypoint=True)

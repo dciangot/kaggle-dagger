@@ -1,9 +1,21 @@
-Tools: github.com/gptscript-ai/csv-reader, sys.download
+tools: clean_and_encode
+
+Do one task after the other:
+
+1. load csv from /home/jovyan/train.csv and clean it up, then store the output in /home/jovyan/preprocessed_train.csv
+2. load csv from /home/jovyan/test.csv and clean it up, then store the output in /home/jovyan/preprocessed_test.csv
+
+---
+
+tools: github.com/gptscript-ai/csv-reader, sys.download
+name: clean_and_encode
+temperature: 0.
+description: load a csv file ${input} and read its schema, then clean up the information, dropping rows with null values and encoding all the columns with categories using one-hot encoding method. Evetually save the output in ${output}
+argument: df: the name of the RDataFrame dataframe
 
 Perform the task one by one.
 
-1. Open the csv "/home/jovyan/train.csv", and read the schema.
+1. Open the csv "{input}", and read the schema.
 2. Based on schema, drop all rows with null values
 3. Based on schema, encode all the columns with categories using one-hot encoding method.
-4. Based on schema, drop the passenger Name column
-5. Store the results in a new csv named "/home/jovyan/preprocessed.csv"
+4. Store the results in a new csv named "{output}"
