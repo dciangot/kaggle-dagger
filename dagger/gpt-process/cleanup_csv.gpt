@@ -1,0 +1,9 @@
+Tools: github.com/gptscript-ai/csv-reader, sys.download
+
+Perform the task one by one.
+
+1. Open the csv "/home/jovyan/train.csv", and read the schema.
+2. Based on schema, drop all rows with null values
+3. Based on schema, encode all the columns with categories using one-hot encoding method.
+4. Based on schema, drop the passenger Name column
+5. Store the results in a new csv named "/home/jovyan/preprocessed.csv"
