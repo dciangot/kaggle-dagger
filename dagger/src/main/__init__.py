@@ -64,6 +64,7 @@ class KaggleDagger:
 
     @function
     def preprocess_data(self, name: str, task_dir: Directory) -> Self:
+        """Execute a python script passed from task dir with deps into requirements.txt"""
 
         self.labcontainer = (
             self.labcontainer
@@ -73,6 +74,25 @@ class KaggleDagger:
             .with_workdir(f"/home/jovyan/work/{name}")
             .with_exec(["pip3", "install", "-r", f"requirements.txt"])
             .with_exec(["python3", f"main.py"])
+        )
+
+        return self
+
+
+    @function
+    def preprocess_gpt(self, name: str, gpt_file: File, openai_token: Secret) -> Self:
+        """Execute a gptScript file with the given openai token and duckDB available for data analysis operation"""
+        self.labcontainer = (
+            self.labcontainer
+            .with_mounted_file(f"/opt/process_{name}/main.gpt", gpt_file)
+            .with_exec(["pip3", "install", f"gptscript"], skip_entrypoint=True)
+            .with_exec(["wget", "https://github.com/duckdb/duckdb/releases/download/v1.0.0/duckdb_cli-linux-amd64.zip"], skip_entrypoint=True)
+            .with_exec(["unzip", "duckdb_cli-linux-amd64.zip"], skip_entrypoint=True)
+            .with_user("root")
+            .with_exec(["mv", "duckdb", "/usr/bin/"], skip_entrypoint=True)
+            .with_user("jovyan")
+            .with_secret_variable("OPENAI_API_KEY", openai_token)
+            .with_exec(["bash", "-c", f"gptscript /opt/process_{name}/main.gpt || echo OPS"])
         )
 
         return self
