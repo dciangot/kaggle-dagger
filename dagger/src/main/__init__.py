@@ -1,16 +1,16 @@
-"""A generated module for KaggleDagger functions
+"""This is a dagger module to chain data-science operation in a reproducible environment.
 
-This module has been generated via dagger init and serves as a reference to
-basic module structure as you get started with Dagger.
+You can chain python code and GPTScript prompts in any combination you want.
 
-Two functions have been pre-created. You can modify, delete, or add to them,
-as needed. They demonstrate usage of arguments and return types using simple
-echo and grep commands. The functions can be called from the dagger CLI or
-from one of the SDKs.
 
-The first line in this comment block is a short description line and the
-rest is a long description with more detail on the module's purpose or usage,
-if appropriate. All modules should have a short description.
+```bash
+dagger call import-data --working-dir ./working_dir --api-keys ~/kaggle.json --competition Titanic \
+  preprocess-data --task-dir ./preprocess1 --name preprocess1 \
+  preprocess-data --task-dir ./preprocess2 --name preprocess2 \
+  preprocess-data --task-dir ./preprocess3 --name preprocess3 \
+  jupyterlab --jupyter-secret env:TOKEN as-service up
+```
+
 """
 
 from typing import Self
@@ -77,20 +77,3 @@ class KaggleDagger:
 
         return self
 
-    @function
-    def preprocess_gpt(self, name: str, gpt_file: File, openai_token: Secret) -> Self:
-        self.labcontainer = (
-            self.labcontainer
-            .with_mounted_file(f"/opt/process_{name}/main.gpt", gpt_file)
-            .with_exec(["pip3", "install", f"gptscript"], skip_entrypoint=True)
-            .with_exec(["wget", "https://github.com/duckdb/duckdb/releases/download/v1.0.0/duckdb_cli-linux-amd64.zip"], skip_entrypoint=True)
-            .with_exec(["unzip", "duckdb_cli-linux-amd64.zip"], skip_entrypoint=True)
-            .with_user("root")
-            .with_exec(["mv", "duckdb", "/usr/bin/"], skip_entrypoint=True)
-            .with_user("jovyan")
-            .with_secret_variable("OPENAI_API_KEY", openai_token)
-            .with_exec(["bash", "-c", f"gptscript /opt/process_{name}/main.gpt || echo OPS"])
-        )
-
-        return self
-        
